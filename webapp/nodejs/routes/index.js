@@ -6,9 +6,11 @@ var crypto  = require('crypto');
 var temp    = require('temp');
 var fs      = require('fs');
 var exec    = require('child_process').exec;
-//var Memcached = require('memcached');
-//var memcached = new Memcached('localhost:11212');
+var Memcached = require('memcached');
+var memcached = new Memcached('localhost:11212');
 var memcache = require('memcache')
+var memcli = new memcache.Client(11212, "localhost");
+memcli.connect();
 
 function markdown(memo, callback) {
     var mdId = 'md-' + memo.id;
@@ -63,7 +65,8 @@ exports.index = function(req, res) {
                  page:  0,
                  total: total
              }, function(err, html) {
-                 memcached.set('index', html, 60, function() {});
+                 //memcached.set('index', html, 60, function() {});
+                 memcli.set('index', html);
                  res.send(html);
              });
         });
