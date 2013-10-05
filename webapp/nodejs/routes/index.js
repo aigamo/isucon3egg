@@ -6,8 +6,9 @@ var crypto  = require('crypto');
 var temp    = require('temp');
 var fs      = require('fs');
 var exec    = require('child_process').exec;
-var Memcached = require('memcached');
-var memcached = new Memcached('localhost:11212');
+//var Memcached = require('memcached');
+//var memcached = new Memcached('localhost:11212');
+var memcache = require('memcache')
 
 function markdown(memo, callback) {
     var mdId = 'md-' + memo.id;

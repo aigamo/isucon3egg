@@ -18,6 +18,7 @@
     "async": "0.2.9",
     "memcached": "0.2.5",
     "temp": "0.6.0",
-    "log4js" : "0.6.9"
+    "log4js" : "0.6.9",
+    "memcache": ""
   }
 }
