@@ -16,6 +16,7 @@
     "connect-memcached": "0.0.6",
     "crypto": "0.0.3",
     "async": "0.2.9",
+    "memcached": "0.2.5",
     "temp": "0.6.0"
   }
 }
