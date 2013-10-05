@@ -56,7 +56,7 @@ if (cluster.isMaster) {
             secret: 'powawa',
             key: 'isucon_session',
             store: new MemcachedStore({
-                hosts: [ 'localhost:11211' ]
+                hosts: [ 'localhost:11212' ]
             })
         }));
         app.use(function(req, res, next) {
