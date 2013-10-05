@@ -66,7 +66,7 @@ exports.index = function(req, res) {
                  total: total
              }, function(err, html) {
                  //memcached.set('index', html, 60, function() {});
-                 memcli.set('index', html);
+                 memcli.set('index', html, 0.9);
                  res.send(html);
              });
         });
@@ -109,7 +109,10 @@ exports.recent = function(req, res) {
                  memos: memos,
                  page:  page,
                  total: total
-             });
+              }, function(err, html) {
+                 memcli.set('recent:/' + page, html, 0.9);
+                 res.send(html);
+              });
         });
     });
 };
@@ -175,7 +178,10 @@ exports.mypage = function(req, res) {
         function(err, results) {
             if (err) { throw err; }
             res.locals.mysql.end();
-            res.render('mypage.ejs', { memos: results });
+            res.render('mypage.ejs', { memos: results }, function(err, html) {
+                 memcli.set('mypqge', html, 0.9);
+                 res.send(html);
+            });
         }
     );
 };
@@ -288,6 +294,9 @@ exports.memo = function(req, res) {
                 memo:  memo,
                 older: older,
                 newer: newer
+            }, function(err, html) {
+                memcli.set('memo:/' + memo.id, html, 0.9);
+                res.send(html);
             });
         }
     ]);
