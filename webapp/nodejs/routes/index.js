@@ -110,7 +110,8 @@ exports.recent = function(req, res) {
                  page:  page,
                  total: total
               }, function(err, html) {
-                 memcli.set('recent:/' + page, html, 0.9);
+                console.log("*********");
+                 memcli.set('recent:/' + page, html, function(){}, 0.9);
                  res.send(html);
               });
         });
@@ -179,7 +180,7 @@ exports.mypage = function(req, res) {
             if (err) { throw err; }
             res.locals.mysql.end();
             res.render('mypage.ejs', { memos: results }, function(err, html) {
-                 memcli.set('mypqge', html, 0.9);
+                 memcli.set('mypqge', html,function(){}, 0.9);
                  res.send(html);
             });
         }
@@ -295,7 +296,7 @@ exports.memo = function(req, res) {
                 older: older,
                 newer: newer
             }, function(err, html) {
-                memcli.set('memo:/' + memo.id, html, 0.9);
+                memcli.set('memo:/' + memo.id, html, function(){}, 0.9);
                 res.send(html);
             });
         }
