@@ -146,18 +146,7 @@ exports.request_signin = function(req, res) {
                         update(Math.random().toString()).digest("hex");
                     req.session.save(function(err) {
                         if (err) { throw err; }
-/*                        client.query(
-                            'UPDATE users SET last_access=now() WHERE id=?',
-                            [ user.id ],
-                            function(err, results) {
-                                if (err) { throw err; }
-                                res.locals.mysql.end();
-                                */
-                                res.redirect('/mypage');
-                                /*
-                            }
-                        );
-                            */
+                        res.redirect('/mypage');
                     });
                });
             } else {

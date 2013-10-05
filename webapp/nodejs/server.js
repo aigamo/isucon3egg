@@ -10,16 +10,9 @@ var partials = require('express-partials');
 var winston = require('winston');
 var log4js = require('log4js');
 
-var logger = new (winston.Logger)({
-transports: [
-new (winston.transports.Console)(),
-new (winston.transports.File)({ filename: 'access.log' })
-]
-});
-
 if (cluster.isMaster) {
 
-    for (var i = 0, childProcesses = []; i < 2; i++) {
+    for (var i = 0, childProcesses = []; i < 3; i++) {
         childProcesses[i] = cluster.fork();
     }
 
