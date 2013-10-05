@@ -61,6 +61,9 @@ exports.index = function(req, res) {
                  memos: memos,
                  page:  0,
                  total: total
+             }, function(err, html) {
+                 memcached.set('index', html, 60, function() {});
+                 res.send(html);
              });
         });
     });
