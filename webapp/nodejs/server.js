@@ -7,6 +7,15 @@ var filters = require('./filters');
 var routes  = require('./routes');
 var config  = require('./config');
 var partials = require('express-partials');
+var winston = require('winston');
+var log4js = require('log4js');
+
+var logger = new (winston.Logger)({
+transports: [
+new (winston.transports.Console)(),
+new (winston.transports.File)({ filename: 'access.log' })
+]
+});
 
 if (cluster.isMaster) {
 
@@ -37,7 +46,25 @@ if (cluster.isMaster) {
     app.configure('development', function () {
         app.use(express.logger('dev'));
         app.use(express.errorHandler());
-    });
+        log4js.configure({
+          'appenders' : [
+          //{ 'type': 'console' }, 
+          {
+          'type': 'file',
+          'filename': 'logs/access.log'
+          //'maxLogSize': 1024 * 1024,
+          //'backups': 5
+          //'category': [ 'project-name', 'console' ]
+          },
+          ],
+          'replaceConsole': true
+          }); 
+        var logger = log4js.getLogger('isucon');
+        app.use(log4js.connectLogger(logger,{
+            'level': log4js.levels.INFO,
+            'format': ':remote-addr - - ":method :url HTTP/:http-version" :status :content-length :response-time'}));
+
+        });
 
     app.configure(function () {
         var MemcachedStore = require('connect-memcached')(express);
