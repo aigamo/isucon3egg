@@ -46,7 +46,7 @@ server {
 
 	#}	
 	location ~ (.+)\.css {
-		set $memcached_key css:$1;
+		set $memcached_key css:$1.css;
 		memcached_pass localhost:11212;
 		default_type text/html;
 		error_page	404 502 = @fallback_css;
@@ -57,7 +57,7 @@ server {
 	}
 
 	location ~ (.+)\.js {
-		set $memcached_key js:$1;
+		set $memcached_key js:$1.js;
 		memcached_pass localhost:11212;
 		default_type text/html;
 		error_page	404 502 = @fallback_js;
