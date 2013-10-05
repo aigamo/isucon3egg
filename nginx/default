@@ -92,31 +92,54 @@ server {
 		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 		proxy_pass	http://backend/signout$1;
 	}
-	location ~ recent(.*) {
-		proxy_set_header Host $host;                    	
-		proxy_set_header X-Real-IP $remote_addr;
-		proxy_set_header X-Forwarded-Host $host;
-		proxy_set_header X-Forwarded-Server $host;
-		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-		proxy_pass	http://backend/recent$1;
-	}
-	location ~ mypage(.*) {
-		proxy_set_header Host $host;                    	
-		proxy_set_header X-Real-IP $remote_addr;
-		proxy_set_header X-Forwarded-Host $host;
-		proxy_set_header X-Forwarded-Server $host;
-		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-		proxy_pass	http://backend/mypage$1;
-	}
-	location ~ memo(.*) {
-		proxy_set_header Host $host;                    	
-		proxy_set_header X-Real-IP $remote_addr;
-		proxy_set_header X-Forwarded-Host $host;
-		proxy_set_header X-Forwarded-Server $host;
-		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-		proxy_pass	http://backend/memo$1;
+
+	location ~ recent/(.+) {
+		set $memcached_key recent:/$1;
+		memcached_pass localhost:11212;
+		default_type text/html;
+		error_page	404 502 = @fallback_recent;
 	}
 
+	location @fallback_recent {
+		proxy_set_header Host $host;                    	
+		proxy_set_header X-Real-IP $remote_addr;
+		proxy_set_header X-Forwarded-Host $host;
+		proxy_set_header X-Forwarded-Server $host;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+		proxy_pass	http://backend/recent/$1;
+	}
+	location ~ mypage {
+		set $memcached_key mypage;
+		memcached_pass localhost:11212;
+		default_type text/html;
+		error_page	404 502 = @fallback_mypage;
+	}
+	location @fallback_mypage {
+		proxy_set_header Host $host;                    	
+		proxy_set_header X-Real-IP $remote_addr;
+		proxy_set_header X-Forwarded-Host $host;
+		proxy_set_header X-Forwarded-Server $host;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+		proxy_pass	http://backend/mypage$1;
+	}
+
+	location ~ memo(.*) {
+		set $memcached_key memo:$1;
+		memcached_pass localhost:11212;
+		default_type text/html;
+		error_page	404 502 = @fallback_memo;
+	}
+	location @fallback_memo {
+		proxy_set_header Host $host;                    	
+		proxy_set_header X-Real-IP $remote_addr;
+		proxy_set_header X-Forwarded-Host $host;
+		proxy_set_header X-Forwarded-Server $host;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+		proxy_pass	http://backend/memo$1;
+	}
 	location ~ / {
 		set $memcached_key index;
 		memcached_pass localhost:11212;
