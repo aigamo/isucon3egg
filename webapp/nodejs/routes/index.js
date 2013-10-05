@@ -6,21 +6,29 @@ var crypto  = require('crypto');
 var temp    = require('temp');
 var fs      = require('fs');
 var exec    = require('child_process').exec;
+var Memcached = require('memcached');
+var memcached = new Memcached('localhost:11212');
 
-function markdown(body, callback) {
-    temp.open('mdfile', function(err, info) {
-        fs.write(info.fd, body);
-        fs.close(info.fd, function(err) {
-            exec('../bin/markdown ' + info.path, function(err, stdout) {
-                var result = stdout;
-                fs.unlink(info.path, function(err) {
-                    if (err) { throw err; }
-                    process.nextTick(function(){
+function markdown(memo, callback) {
+    var mdId = 'md-' + memo.id;
+    memcached.get(mdId, function(err, data) {
+        if (err) { throw err; }
+        if (data == "false" || data == false) {
+             temp.open('mdfile', function(err, info) {
+                fs.write(info.fd, memo.content);
+                fs.close(info.fd, function(err) {
+                    exec('../bin/markdown ' + info.path, function(err, stdout) {
+                        var result = stdout;
+                        fs.unlink(info.path, function() { });
+                        callback(null, result);
+                        memcached.set(mdId, result, 100000, function() {});
                         callback(null, result);
                     });
                 });
             });
-        });
+        } else {
+            callback(null, data);
+        }
     });
 };
 
@@ -138,15 +146,18 @@ exports.request_signin = function(req, res) {
                         update(Math.random().toString()).digest("hex");
                     req.session.save(function(err) {
                         if (err) { throw err; }
-                        client.query(
+/*                        client.query(
                             'UPDATE users SET last_access=now() WHERE id=?',
                             [ user.id ],
                             function(err, results) {
                                 if (err) { throw err; }
                                 res.locals.mysql.end();
+                                */
                                 res.redirect('/mypage');
+                                /*
                             }
                         );
+                            */
                     });
                });
             } else {
@@ -220,7 +231,7 @@ exports.memo = function(req, res) {
                 }
             }
 
-            markdown(memo.content, cb);
+            markdown(memo, cb);
         },
         function(html, cb) {
             if (res.is_halt) {
